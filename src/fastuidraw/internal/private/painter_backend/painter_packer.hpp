@@ -111,16 +111,12 @@ namespace fastuidraw
 
     /*!
      * Ctor.
-     * \param pool pool with which to make a default brush; this brush
-     *             is used when draw_generic() is called and the passed
-     *             PainterData object lacks a brush value
      * \param stats location to which to update stat values
      * \param backend handle to PainterBackend for the constructed PainterPacker
      * \param config configuration from PainterEngine
      */
     explicit
-    PainterPacker(PainterPackedValuePool &pool,
-                  vecN<unsigned int, num_stats> &stats,
+    PainterPacker(vecN<unsigned int, num_stats> &stats,
                   reference_counted_ptr<PainterBackend> backend,
                   const PainterEngine::ConfigurationBase &config);
 

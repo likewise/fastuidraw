@@ -514,8 +514,7 @@ active(void) const
 ////////////////////////////////////////////
 // fastuidraw::PainterPacker methods
 fastuidraw::PainterPacker::
-PainterPacker(PainterPackedValuePool &pool,
-              vecN<unsigned int, num_stats> &stats,
+PainterPacker(vecN<unsigned int, num_stats> &stats,
               reference_counted_ptr<PainterBackend> backend,
               const PainterEngine::ConfigurationBase &config):
   m_backend(backend),
