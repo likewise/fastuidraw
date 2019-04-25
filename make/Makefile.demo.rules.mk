@@ -82,7 +82,7 @@ $(1)-$(3): $(1)-$(2)-$(3)
 $(1): $(1)-$(2)
 .PHONY: $(1)
 $(1)-$(2)-$(3): libFastUIDraw$(2)_$(3) $$(THISDEMO_$(1)_$(2)_$(3)_ALL_OBJS)
-	$$(CXX) -o $$@ $$(THISDEMO_$(1)_$(2)_$(3)_ALL_OBJS) $$(DEMO_$(3)_LIBS_$(2)) $(DEMO_COMMON_LIBS)
+	$$(CXX) $(LDFLAGS) -o $$@ $$(THISDEMO_$(1)_$(2)_$(3)_ALL_OBJS) $$(DEMO_$(3)_LIBS_$(2)) $(DEMO_COMMON_LIBS)
 
 demos-$(2)-$(3)-static: $(1)-$(2)-$(3)-static
 .PHONY: demos-$(2)-$(3)-static
@@ -93,7 +93,7 @@ $(1)-$(3)-static: $(1)-$(2)-$(3)-static
 $(1)-static: $(1)-$(2)-static
 .PHONY: $(1)-static
 $(1)-$(2)-$(3)-static: libFastUIDraw_$(3).a libFastUIDraw$(2)_$(3).a libN$(2)_$(3).a $$(THISDEMO_$(1)_$(2)_$(3)_ALL_OBJS)
-	$$(CXX) -o $$@ $$(THISDEMO_$(1)_$(2)_$(3)_ALL_OBJS) $(DEMO_COMMON_LIBS) $$(DEMO_$(3)_LIBS_STATIC_$(2))
+	$$(CXX) $(LDFLAGS) -o $$@ $$(THISDEMO_$(1)_$(2)_$(3)_ALL_OBJS) $(DEMO_COMMON_LIBS) $$(DEMO_$(3)_LIBS_STATIC_$(2))
 endif
 )
 endef
