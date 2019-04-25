@@ -48,22 +48,6 @@ namespace fastuidraw
     ~PainterPackedValuePool();
 
     /*!
-     * Create and return a PainterPackedValue<PainterClipEquations>
-     * object for the value of a PainterClipEquations object.
-     * \param value data to pack into returned PainterPackedValue
-     */
-    PainterPackedValue<PainterClipEquations>
-    create_packed_value(const PainterClipEquations &value);
-
-    /*!
-     * Create and return a PainterPackedValue<PainterItemMatrix>
-     * object for the value of a PainterItemMatrix object.
-     * \param value data to pack into returned PainterPackedValue
-     */
-    PainterPackedValue<PainterItemMatrix>
-    create_packed_value(const PainterItemMatrix &value);
-
-    /*!
      * Create and return a PainterPackedValue<PainterItemShaderData>
      * object for the value of a PainterItemShaderData object.
      * \param value data to pack into returned PainterPackedValue
@@ -110,14 +94,6 @@ namespace fastuidraw
       R.make_packed(*this);
       return R;
     }
-
-    /*!
-     * Create and return a PainterPackedValue<PainterBrushAdjust>
-     * object for the value of a PainterBrushAdjust object.
-     * \param value data to pack into returned PainterPackedValue
-     */
-    PainterPackedValue<PainterBrushAdjust>
-    create_packed_value(const PainterBrushAdjust &value);
 
   private:
     void *m_d;

@@ -16,6 +16,8 @@
  *
  */
 
+#pragma once
+
 #include <vector>
 #include <fastuidraw/util/reference_counted.hpp>
 #include <fastuidraw/util/vecN.hpp>
@@ -87,10 +89,9 @@ namespace fastuidraw
       class NoLocalCopy
       {
       public:
-        const void*
+        void
         copy_value(const T&)
         {
-          return nullptr;
         }
       };
 
@@ -100,11 +101,10 @@ namespace fastuidraw
       public:
         T m_v;
 
-        const void*
+        void
         copy_value(const T &src)
         {
           m_v = src;
-          return &m_v;
         }
       };
 
@@ -265,7 +265,6 @@ namespace fastuidraw
         std::vector<reference_counted_ptr<const resource_base> > m_resources;
         std::vector<reference_counted_ptr<const Image> > m_bind_images;
         vecN<unsigned int, PainterSurface::number_buffer_types> m_draw_command_id, m_offset;
-        const void *m_raw_data;
 
       protected:
         void
@@ -309,7 +308,13 @@ namespace fastuidraw
           st.pack_data(make_c_array(m_data));
           ResourceType::fetch_resources(st, &m_resources);
           BindImageType::fetch_bind_images(st, &m_bind_images);
-          this->m_raw_data = m_copy.copy_value(st);
+          m_copy.copy_value(st);
+        }
+
+        const T&
+        unpacked_value(void) const
+        {
+          return m_copy.m_v;
         }
 
       private:
@@ -319,6 +324,76 @@ namespace fastuidraw
         typedef typename GetType::CopyType CopyType;
 
         CopyType m_copy;
+      };
+
+      class ElementHandle
+      {
+      public:
+        ElementHandle(Element *d = nullptr):
+          m_d(d)
+        {
+          if (m_d)
+            {
+              m_d->acquire();
+            }
+        }
+
+        ElementHandle(const ElementHandle &obj):
+          m_d(obj.m_d)
+        {
+          if (m_d)
+            {
+              m_d->acquire();
+            }
+        }
+
+        ~ElementHandle()
+        {
+          if (m_d)
+            {
+              ElementBase::release(m_d);
+            }
+        }
+
+        void
+        swap(ElementHandle &obj)
+        {
+          std::swap(m_d, obj.m_d);
+        }
+
+        ElementHandle&
+        operator=(const ElementHandle &obj)
+        {
+          if (m_d != obj.m_d)
+            {
+              ElementHandle v(obj);
+              swap(v);
+            }
+          return *this;
+        }
+
+        void
+        reset(void)
+        {
+          if (m_d)
+            {
+              ElementBase::release(m_d);
+            }
+          m_d = nullptr;
+        }
+
+        const T&
+        unpacked_value(void) const
+        {
+          FASTUIDRAWassert(m_d);
+          return m_d->unpacked_value();
+        }
+
+        operator
+        ElementBase*() const { return m_d; }
+
+      private:
+        Element *m_d;
       };
 
       class Holder

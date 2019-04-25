@@ -349,6 +349,12 @@ pack_state_data(enum fastuidraw::PainterSurface::render_type_t render_type,
                 detail::PackedValuePoolBase::ElementBase *d,
                 uint32_t &location)
 {
+  if (!d)
+    {
+      location = 0;
+      return;
+    }
+
   if (d->m_painter[render_type] == p && d->m_draw_command_id[render_type] == p->m_number_commands)
     {
       location = d->m_offset[render_type];
@@ -579,6 +585,13 @@ compute_room_needed_for_packing(const PainterData::value<T> &obj)
     {
       return 0;
     }
+}
+
+unsigned int
+fastuidraw::PainterPacker::
+compute_room_needed_for_packing(const detail::PackedValuePoolBase::ElementBase* d)
+{
+  return (d) ? d->m_data.size() : 0;
 }
 
 unsigned int

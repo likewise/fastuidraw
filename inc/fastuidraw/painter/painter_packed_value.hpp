@@ -68,9 +68,6 @@ namespace fastuidraw
     c_array<const reference_counted_ptr<const Image> >
     bind_images(void) const;
 
-    const void*
-    unpacked_value(void) const;
-
     void *m_d;
   };
 
@@ -144,18 +141,6 @@ namespace fastuidraw
     bind_images(void) const
     {
       return PainterPackedValueBase::bind_images();
-    }
-
-    /*!
-     * Returns a -pointer- to the value that generated this
-     * \ref PainterPackedValue. Returns nullptr if either
-     * this is a null-handle or if T is not one of \ref
-     * PainterItemMatrix or \ref PainterClipEquations.
-     */
-    const T*
-    unpacked_value(void) const
-    {
-      return static_cast<const T*>(PainterPackedValueBase::unpacked_value());
     }
 
     /*!

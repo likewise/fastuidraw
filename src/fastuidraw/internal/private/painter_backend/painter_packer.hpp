@@ -405,6 +405,9 @@ namespace fastuidraw
     unsigned int
     compute_room_needed_for_packing(const PainterData::value<T> &obj);
 
+    unsigned int
+    compute_room_needed_for_packing(const detail::PackedValuePoolBase::ElementBase* d);
+
     template<typename T, typename ShaderType>
     void
     draw_generic_implement(ivec2 deferred_coverage_buffer_offset,
