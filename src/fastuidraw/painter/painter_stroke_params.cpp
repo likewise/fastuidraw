@@ -56,6 +56,12 @@ fastuidraw::PainterStrokeParams::
   FASTUIDRAWdelete(d);
 }
 
+copy_ctor(fastuidraw::PainterStrokeParams,
+          PainterStrokeParams,
+          PainterStrokeParamsPrivate)
+
+assign_swap_implement(fastuidraw::PainterStrokeParams)
+
 setget_implement(fastuidraw::PainterStrokeParams,
                  PainterStrokeParamsPrivate,
                  float, radius)

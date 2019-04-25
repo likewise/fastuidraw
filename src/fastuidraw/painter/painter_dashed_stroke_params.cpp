@@ -68,6 +68,12 @@ fastuidraw::PainterDashedStrokeParams::
   FASTUIDRAWdelete(d);
 }
 
+copy_ctor(fastuidraw::PainterDashedStrokeParams,
+          PainterDashedStrokeParams,
+          PainterDashedStrokedParamsPrivate)
+
+assign_swap_implement(fastuidraw::PainterDashedStrokeParams)
+
 setget_implement(fastuidraw::PainterDashedStrokeParams,
                  PainterDashedStrokedParamsPrivate,
                  float, miter_limit)

@@ -713,6 +713,13 @@ namespace fastuidraw
     {}
 
     /*!
+     * Copy ctor.
+     */
+    PainterBrush(const PainterBrush &obj):
+      m_data(obj.m_data)
+    {}
+
+    /*!
      * Ctor. Initializes the brush to have no image, no gradient,
      * no repeat window and no transformation with the given
      * color color.
@@ -721,6 +728,17 @@ namespace fastuidraw
     PainterBrush(const vec4 &pcolor)
     {
       m_data.m_color = pcolor;
+    }
+
+    /*!
+     * Assignment operator.
+     * \param obj value from which to copy
+     */
+    PainterBrush&
+    operator=(const PainterBrush &obj)
+    {
+      m_data = obj.m_data;
+      return *this;
     }
 
     /*!

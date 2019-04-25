@@ -72,7 +72,26 @@ namespace fastuidraw
      */
     PainterStrokeParams(void);
 
+    /*!
+     * Copy ctor.
+     */
+    PainterStrokeParams(const PainterStrokeParams &obj);
+
     ~PainterStrokeParams();
+
+    /*!
+     * Assignment operator.
+     * \param obj value from which to copy
+     */
+    PainterStrokeParams&
+    operator=(const PainterStrokeParams &obj);
+
+    /*!
+     * Swap operation
+     * \param obj object with which to swap
+     */
+    void
+    swap(PainterStrokeParams &obj);
 
     /*!
      * The miter limit for miter joins.
