@@ -29,59 +29,141 @@ namespace fastuidraw
     namespace PackedValuePoolHelper
     {
       template<typename T>
-      class FillData
+      class NoResources
       {
       public:
         static
         void
-        fetch_data(const T &src, std::vector<generic_data> *dst)
+        fetch_resources(const T &,
+                        std::vector<reference_counted_ptr<const resource_base> > *dst)
         {
-          dst->resize(src.data_size());
-          src.pack_data(fastuidraw::make_c_array(*dst));
+          dst->clear();
         }
       };
 
       template<typename T>
-      class CopyData
+      class HasResources
       {
       public:
         static
         void
-        fetch_data(const T &src,
-                   std::vector<generic_data> *dst)
+        fetch_resources(const T &src,
+                        std::vector<reference_counted_ptr<const resource_base> > *dst)
         {
-          c_array<const generic_data> src_data(src.packed_data());
-          dst->resize(src_data.size());
-          std::copy(src_data.begin(), src_data.end(), dst->begin());
+          dst->resize(src.number_resources());
+          src.save_resources(make_c_array(*dst));
+        }
+      };
+
+      template<typename T>
+      class NoBindImages
+      {
+      public:
+        static
+        void
+        fetch_bind_images(const T &,
+                          std::vector<reference_counted_ptr<const Image> > *dst)
+        {
+          dst->clear();
+        }
+      };
+
+      template<typename T>
+      class HasBindImages
+      {
+      public:
+        static
+        void
+        fetch_bind_images(const T &src,
+                          std::vector<reference_counted_ptr<const Image> > *dst)
+        {
+          c_array<const reference_counted_ptr<const Image> > src_array(src.bind_images());
+          dst->resize(src_array.size());
+          std::copy(src_array.begin(), src_array.end(), dst->begin());
+        }
+      };
+
+      template<typename T>
+      class NoLocalCopy
+      {
+      public:
+        const void*
+        copy_value(const T&)
+        {
+          return nullptr;
+        }
+      };
+
+      template<typename T>
+      class HasLocalCopy
+      {
+      public:
+        T m_v;
+
+        const void*
+        copy_value(const T &src)
+        {
+          m_v = src;
+          return &m_v;
         }
       };
 
       template<typename T>
       class DataType
-      {
-      public:
-        typedef CopyData<T> Type;
-      };
+      {};
 
       template<>
       class DataType<PainterClipEquations>
       {
       public:
-        typedef FillData<PainterClipEquations> Type;
+        typedef NoBindImages<PainterClipEquations> BindImageType;
+        typedef NoResources<PainterClipEquations> ResourceType;
+        typedef HasLocalCopy<PainterClipEquations> CopyType;
       };
 
       template<>
       class DataType<PainterItemMatrix>
       {
       public:
-        typedef FillData<PainterItemMatrix> Type;
+        typedef NoBindImages<PainterItemMatrix> BindImageType;
+        typedef NoResources<PainterItemMatrix> ResourceType;
+        typedef HasLocalCopy<PainterItemMatrix> CopyType;
       };
 
       template<>
       class DataType<PainterBrushAdjust>
       {
       public:
-        typedef FillData<PainterBrushAdjust> Type;
+        typedef NoBindImages<PainterBrushAdjust> BindImageType;
+        typedef NoResources<PainterBrushAdjust> ResourceType;
+        typedef NoLocalCopy<PainterBrushAdjust> CopyType;
+      };
+
+      template<>
+      class DataType<PainterItemShaderData>
+      {
+      public:
+        typedef NoBindImages<PainterItemShaderData> BindImageType;
+        typedef HasResources<PainterItemShaderData> ResourceType;
+        typedef NoLocalCopy<PainterItemShaderData> CopyType;
+      };
+
+      template<>
+      class DataType<PainterBlendShaderData>
+      {
+      public:
+        typedef NoBindImages<PainterBlendShaderData> BindImageType;
+        typedef HasResources<PainterBlendShaderData> ResourceType;
+        typedef NoLocalCopy<PainterBlendShaderData> CopyType;
+      };
+
+      template<>
+      class DataType<PainterBrushShaderData>
+      {
+      public:
+        typedef HasBindImages<PainterBrushShaderData> BindImageType;
+        typedef HasResources<PainterBrushShaderData> ResourceType;
+        typedef NoLocalCopy<PainterBrushShaderData> CopyType;
       };
     }
 
@@ -135,7 +217,6 @@ namespace fastuidraw
         explicit
         ElementBase(void):
           m_painter(nullptr),
-          m_raw_data(nullptr), //should be set by derived class
           m_ref_count(0)
         {}
 
@@ -179,8 +260,10 @@ namespace fastuidraw
          * already packed into PainterDraw::m_store; we track
          * a PainterPacker for each Surface::render_type_t.
          */
-        vecN<const void *, PainterSurface::number_buffer_types> m_painter;
+        vecN<const void*, PainterSurface::number_buffer_types> m_painter;
         std::vector<generic_data> m_data;
+        std::vector<reference_counted_ptr<const resource_base> > m_resources;
+        std::vector<reference_counted_ptr<const Image> > m_bind_images;
         vecN<unsigned int, PainterSurface::number_buffer_types> m_draw_command_id, m_offset;
         const void *m_raw_data;
 
@@ -216,24 +299,26 @@ namespace fastuidraw
       class Element:public PackedValuePoolBase::ElementBase
       {
       public:
-        Element(void)
-        {
-          m_raw_data = &m_state;
-        }
-
         void
         initialize(const T &st,
                    PackedValuePoolBase::Slot slot,
                    PackedValuePoolBase *p)
         {
           this->initialize_common(slot, p);
-          m_state = st;
-          GetData::fetch_data(m_state, &m_data);
+          m_data.resize(st.data_size());
+          st.pack_data(make_c_array(m_data));
+          ResourceType::fetch_resources(st, &m_resources);
+          BindImageType::fetch_bind_images(st, &m_bind_images);
+          this->m_raw_data = m_copy.copy_value(st);
         }
 
       private:
-        typedef typename PackedValuePoolHelper::DataType<T>::Type GetData;
-        T m_state;
+        typedef typename PackedValuePoolHelper::DataType<T> GetType;
+        typedef typename GetType::ResourceType ResourceType;
+        typedef typename GetType::BindImageType BindImageType;
+        typedef typename GetType::CopyType CopyType;
+
+        CopyType m_copy;
       };
 
       class Holder

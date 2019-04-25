@@ -397,11 +397,11 @@ namespace
     {
       if (m_override_matrix_state)
         {
-          return m_override_matrix_state.value().m_item_matrix;
+          return m_override_matrix_state.unpacked_value()->m_item_matrix;
         }
 
       return (m_item_matrix_state) ?
-        m_item_matrix_state.value().m_item_matrix :
+        m_item_matrix_state.unpacked_value()->m_item_matrix :
         m_item_matrix.m_item_matrix;
     }
 
@@ -503,7 +503,7 @@ namespace
     clip_equations_state(const fastuidraw::PainterPackedValue<fastuidraw::PainterClipEquations> &v)
     {
       m_clip_equations_state = v;
-      m_clip_equations = v.value();
+      m_clip_equations = *v.unpacked_value();
     }
 
     bool
@@ -1767,7 +1767,7 @@ namespace
     fastuidraw::reference_counted_ptr<fastuidraw::PainterEffectColorModulate> m_color_modulate_fx;
     fastuidraw::PainterShaderSet m_default_shaders;
     fastuidraw::PainterPackedValuePool m_pool;
-    fastuidraw::PainterPackedValue<fastuidraw::PainterBrush> m_reset_brush, m_black_brush;
+    fastuidraw::PainterData::brush_value m_black_brush;
     const fastuidraw::PainterPackedValue<fastuidraw::PainterBrushAdjust> *m_current_brush_adjust;
     ClipEquationStore m_clip_store;
     PainterWorkRoom m_work_room;
@@ -2128,7 +2128,7 @@ set_clip_equations_to_clip_rect(const fastuidraw::PainterPackedValue<fastuidraw:
   /* see if the vertices of the clipping rectangle are all within the
    * passed clipped equations.
    */
-  const fastuidraw::PainterClipEquations &eq(pcl.value());
+  const fastuidraw::PainterClipEquations &eq(*pcl.unpacked_value());
   std::bitset<4> return_value;
 
   /* return_value[i] is true exactly when each point of the rectangle is inside
@@ -2721,8 +2721,7 @@ PainterPrivate(const fastuidraw::reference_counted_ptr<fastuidraw::PainterEngine
   m_color_modulate_fx = FASTUIDRAWnew fastuidraw::PainterEffectColorModulate();
   m_root_packer = FASTUIDRAWnew fastuidraw::PainterPacker(m_pool, m_stats, m_backend,
                                                           m_backend_factory->configuration_base());
-  m_reset_brush = m_pool.create_packed_value(fastuidraw::PainterBrush());
-  m_black_brush = m_pool.create_packed_value(fastuidraw::PainterBrush()
+  m_black_brush = m_pool.create_packed_brush(fastuidraw::PainterBrush()
                                              .color(0.0f, 0.0f, 0.0f, 0.0f));
   m_root_identity_matrix = m_pool.create_packed_value(fastuidraw::PainterItemMatrix());
   m_current_z = 1;
@@ -6306,7 +6305,7 @@ clip_in_rect(const Rect &rect)
    * We do this because round off error can have us
    * miss a few pixels when drawing the occluder
    */
-  PainterClipEquations slightly_bigger(current_clip.value());
+  PainterClipEquations slightly_bigger(*current_clip.unpacked_value());
   for(unsigned int i = 0; i < 4; ++i)
     {
       float f;
@@ -6325,7 +6324,7 @@ clip_in_rect(const Rect &rect)
         {
           d->draw_half_plane_complement(default_shaders().fill_shader(),
                                         PainterData(d->m_black_brush),
-                                        prev_clip.value().m_clip_equations[i]);
+                                        prev_clip.unpacked_value()->m_clip_equations[i]);
         }
     }
   d->packer()->remove_callback(zdatacallback);

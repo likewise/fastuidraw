@@ -34,7 +34,7 @@ namespace fastuidraw
    * as according to PainterDashedStrokeParams::stroke_data_offset_t.
    * Data for dashing is packed [TODO describe].
    */
-  class PainterDashedStrokeParams:public PainterItemShaderData, noncopyable
+  class PainterDashedStrokeParams:public PainterItemShaderData
   {
   public:
     /*!

@@ -68,18 +68,18 @@ fastuidraw::PainterDashedStrokeParams::
   FASTUIDRAWdelete(d);
 }
 
-setget_implement_callback(fastuidraw::PainterDashedStrokeParams,
-                          PainterDashedStrokedParamsPrivate,
-                          float, miter_limit, mark_dirty())
+setget_implement(fastuidraw::PainterDashedStrokeParams,
+                 PainterDashedStrokedParamsPrivate,
+                 float, miter_limit)
 
-setget_implement_callback(fastuidraw::PainterDashedStrokeParams,
-                          PainterDashedStrokedParamsPrivate,
-                          float, radius, mark_dirty())
+setget_implement(fastuidraw::PainterDashedStrokeParams,
+                 PainterDashedStrokedParamsPrivate,
+                 float, radius)
 
-setget_implement_callback(fastuidraw::PainterDashedStrokeParams,
-                          PainterDashedStrokedParamsPrivate,
-                          enum fastuidraw::PainterStrokeParams::stroking_units_t,
-                          stroking_units, mark_dirty())
+setget_implement(fastuidraw::PainterDashedStrokeParams,
+                 PainterDashedStrokedParamsPrivate,
+                 enum fastuidraw::PainterStrokeParams::stroking_units_t,
+                 stroking_units)
 
 float
 fastuidraw::PainterDashedStrokeParams::
@@ -215,7 +215,6 @@ dash_pattern(c_array<const DashPatternElement> f)
         }
     }
 
-  mark_dirty();
   return *this;
 }
 

@@ -32,7 +32,7 @@ namespace fastuidraw
    * Class to specify stroking parameters, data is packed
    * as according to PainterStrokeParams::stroke_data_offset_t.
    */
-  class PainterStrokeParams:public PainterItemShaderData, noncopyable
+  class PainterStrokeParams:public PainterItemShaderData
   {
   public:
     /*!

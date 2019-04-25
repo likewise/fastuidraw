@@ -421,7 +421,6 @@ namespace fastuidraw
     flush_implement(void);
 
     reference_counted_ptr<PainterBackend> m_backend;
-    PainterData::value<PainterBrush> m_default_brush;
     unsigned int m_header_size;
 
     PainterBlendShader *m_blend_shader;
