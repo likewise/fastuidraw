@@ -13,6 +13,7 @@ ifeq ($(CHECK_FREETYPE_LIBS_CODE), 0)
 CHECK_FREETYPE_LIBS := "Found libs for freetype2: $(shell pkg-config freetype2 --libs)"
 else
 CHECK_FREETYPE_LIBS := "Cannot build FastUIDraw: Unable to find freetype2 libs from pkg-config: $(shell pkg-config freetype2 --libs 2>$1)"
+FASTUIDRAW_CAN_BUILD := 0
 endif
 
 #####################################
@@ -42,6 +43,7 @@ CHECK_GL_HEADERS := "GL headers found: $(FOUND_GL_HEADERS)"
 endif
 ifneq ($(HAVE_MISSING_GL_HEADERS), 0)
 CHECK_GL_HEADERS += "GL headers missing: $(MISSING_GL_HEADERS)"
+FASTUIDRAW_CAN_BUILD := 0
 endif
 
 endif
@@ -58,6 +60,7 @@ CHECK_GLES_HEADERS := "GLES headers found: $(FOUND_GLES_HEADERS)"
 endif
 ifneq ($(HAVE_MISSING_GLES_HEADERS), 0)
 CHECK_GLES_HEADERS += "GLES headers missing: $(MISSING_GLES_HEADERS)"
+FASTUIDRAW_CAN_BUILD := 0
 endif
 
 endif
@@ -110,6 +113,11 @@ endif
 ifeq ($(BUILD_GLES), 1)
 	@echo "$(CHECK_GLES_HEADERS)"
 endif
+
+ifeq ($(FASTUIDRAW_CAN_BUILD), 0)
+	@false
+endif
+
 
 .PHONY: check
 
